@@ -2,15 +2,16 @@ package io.github.gmathi.novellibrary.fragment
 
 import android.animation.Animator
 import android.os.Bundle
-import androidx.core.view.GravityCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.GravityCompat
 import io.github.gmathi.novellibrary.R
-import io.github.gmathi.novellibrary.adapter.*
+import io.github.gmathi.novellibrary.adapter.GenericFragmentStatePagerAdapter
+import io.github.gmathi.novellibrary.adapter.NavPageListener
+import io.github.gmathi.novellibrary.adapter.SearchResultsListener
 import io.github.gmathi.novellibrary.dataCenter
 import io.github.gmathi.novellibrary.extensions.hideSoftKeyboard
-import io.github.gmathi.novellibrary.model.Novel
 import io.github.gmathi.novellibrary.util.SimpleAnimationListener
 import io.github.gmathi.novellibrary.util.SuggestionsBuilder
 import io.github.gmathi.novellibrary.util.addToSearchHistory
@@ -21,8 +22,8 @@ import org.cryse.widget.persistentsearch.PersistentSearchView
 
 class SearchFragment : BaseFragment() {
 
-    lateinit var adapter: GenericAdapter<Novel>
-    var searchMode: Boolean = false
+    //private lateinit var adapter: GenericAdapter<Novel>
+    private var searchMode: Boolean = false
     private var searchTerm: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
