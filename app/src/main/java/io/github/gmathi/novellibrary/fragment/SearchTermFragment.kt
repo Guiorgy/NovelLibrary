@@ -67,12 +67,6 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
 
         setRecyclerView()
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("results")) {
-                @Suppress("UNCHECKED_CAST")
-                adapter.updateData(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
-                return
-            }
         if (savedInstanceState != null && savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
             @Suppress("UNCHECKED_CAST")
             adapter.updateData(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
