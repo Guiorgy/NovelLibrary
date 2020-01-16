@@ -71,7 +71,7 @@ class SearchFragment : BaseFragment() {
             activity?.drawerLayout?.openDrawer(GravityCompat.START)
         }
         searchView.setSuggestionBuilder(SuggestionsBuilder())
-        searchView.setSearchListener(object : PersistentSearchView.SearchListener {
+        val listener = object : PersistentSearchView.SearchListener {
 
             override fun onSearch(searchTerm: String?) {
                 searchTerm?.addToSearchHistory()
@@ -128,7 +128,15 @@ class SearchFragment : BaseFragment() {
                 }
                 return false
             }
-        })
+        }
+
+        searchView.viewTreeObserver.addOnGlobalFocusChangeListener(
+                object : ViewTreeObserver.OnGlobalFocusChangeListener {
+                    override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
+                        searchView.viewTreeObserver.removeOnGlobalFocusChangeListener(this)
+                        searchView.setSearchListener(listener)
+                    }
+                })
     }
 
 
