@@ -1,6 +1,5 @@
 package io.github.gmathi.novellibrary.fragment
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -84,11 +83,9 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
 
         if (savedInstanceState != null && savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
             items.clear()
-            @Suppress("UNCHECKED_CAST")
-            items.addAll(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
+            items.addAll(savedInstanceState.getParcelableArrayList("results")!!)
             currentPageNumber = savedInstanceState.getInt("page")
             android.util.Log.i("MyState3", "restoring ${adapter.items.count()}/${recyclerView.adapter?.itemCount} items, currentPageNumber=$currentPageNumber, visible=$isVisible")
-            return
         }
     }
 
@@ -112,9 +109,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     private fun setRecyclerView() {
         adapter = GenericAdapter(items = this.items, layoutResId = R.layout.listitem_novel, listener = this, loadMoreListener = if (resultType != HostNames.WLN_UPDATES) this else null)
         recyclerView.setDefaults(adapter)
-        recyclerView.layoutManager = LinearLayoutManager(context ,LinearLayoutManager.VERTICAL, false)
         swipeRefreshLayout.setOnRefreshListener { searchNovels() }
-        recyclerView.setBackgroundColor(Color.RED)
     }
 
     private fun searchNovels() {
