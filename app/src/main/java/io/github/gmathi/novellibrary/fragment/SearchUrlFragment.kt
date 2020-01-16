@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
     
-    override val preloadCount:Int = 50
+    override var preloadCount:Int = 50
     override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
 
     companion object {
@@ -43,11 +43,26 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     override var currentPageNumber: Int = 1
     private lateinit var searchUrl: String
     private lateinit var adapter: GenericAdapter<Novel>
+    private val items = ArrayList<Novel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         android.util.Log.i("MyState2", "onCreate")
+
+        searchUrl = arguments?.getString("url")!!
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("url")) {
+                searchUrl = savedInstanceState.getString("url", searchUrl)
+            }
+            if (savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
+                items.clear()
+                @Suppress("UNCHECKED_CAST")
+                items.addAll(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
+                currentPageNumber = savedInstanceState.getInt("page")
+                android.util.Log.i("MyState2", "restoring ${items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -57,30 +72,17 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         //(activity as AppCompatActivity).setSupportActionBar(null)
-        searchUrl = arguments?.getString("url")!!
         setRecyclerView()
         android.util.Log.i("MyState2", "onActivityCreated with ${if (savedInstanceState == null) "null" else "non null"} state")
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("url")) {
-                searchUrl = savedInstanceState.getString("url", searchUrl)
-            }
-            if (savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
-                @Suppress("UNCHECKED_CAST")
-                adapter.updateData(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
-                currentPageNumber = savedInstanceState.getInt("page")
-                progressLayout.showContent()
-                android.util.Log.i("MyState2", "restoring ${adapter.items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
-                return
-            }
+        if (items.isEmpty()) {
+            progressLayout.showLoading()
+            searchNovels()
         }
-
-        progressLayout.showLoading()
-        searchNovels()
     }
 
     private fun setRecyclerView() {
-        adapter = GenericAdapter(items = ArrayList(), layoutResId = R.layout.listitem_novel, listener = this, loadMoreListener = this)
+        adapter = GenericAdapter(items = this.items, layoutResId = R.layout.listitem_novel, listener = this, loadMoreListener = this)
         recyclerView.setDefaults(adapter)
         swipeRefreshLayout.setOnRefreshListener { searchNovels() }
     }
@@ -187,9 +189,9 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        android.util.Log.i("MyState2", "onSaveInstanceState with ${adapter.items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
-        if (adapter.items.isNotEmpty())
-            outState.putSerializable("results", adapter.items)
+        android.util.Log.i("MyState2", "onSaveInstanceState with ${items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
+        if (items.isNotEmpty())
+            outState.putSerializable("results", items)
         outState.putSerializable("page", currentPageNumber)
         outState.putString("url", searchUrl)
     }

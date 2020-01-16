@@ -23,7 +23,6 @@ import org.cryse.widget.persistentsearch.PersistentSearchView
 
 class SearchFragment : BaseFragment(){
 
-    //private lateinit var adapter: GenericAdapter<Novel>
     private var searchMode: Boolean = false
     private var searchTerm: String? = null
 
@@ -31,6 +30,13 @@ class SearchFragment : BaseFragment(){
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         android.util.Log.i("MyState1", "onCreate")
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("searchTerm"))
+                searchTerm = savedInstanceState.getString("searchTerm")
+            if (savedInstanceState.containsKey("searchMode"))
+                searchMode = savedInstanceState.getBoolean("searchMode")
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -42,12 +48,6 @@ class SearchFragment : BaseFragment(){
 
         setSearchView()
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("searchTerm"))
-                searchTerm = savedInstanceState.getString("searchTerm")
-            if (savedInstanceState.containsKey("searchMode"))
-                searchMode = savedInstanceState.getBoolean("searchMode")
-        }
         android.util.Log.i("MyState1", "onActivityCreated, searchTerm=$searchTerm, searchMode=$searchMode")
 
         if (searchMode && searchTerm != null)
