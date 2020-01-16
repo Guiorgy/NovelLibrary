@@ -22,8 +22,15 @@ import io.github.gmathi.novellibrary.util.getGlideUrl
 import io.github.gmathi.novellibrary.util.setDefaults
 import kotlinx.android.synthetic.main.content_recycler_view.*
 import kotlinx.android.synthetic.main.listitem_novel.view.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
+
+
+    override var currentPageNumber: Int = 1
+    override val preloadCount:Int = 50
+    override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
+    private lateinit var searchUrl: String
 
     companion object {
         fun newInstance(url: String): SearchUrlFragment {
@@ -100,6 +107,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
                 android.util.Log.i("MyState2", "searchNovels! visible=$isVisible, detached=$isDetached, removing=$isRemoving")
                 if (isVisible && (!isDetached || !isRemoving)) {
                     loadSearchResults(results)
+                    isPageLoading.lazySet(false)
                     swipeRefreshLayout.isRefreshing = false
                 }
             } else {
@@ -172,8 +180,10 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     }
 
     override fun loadMore() {
-        currentPageNumber++
-        searchNovels()
+        if (isPageLoading.compareAndSet(false, true)) {
+            currentPageNumber++
+            searchNovels()
+        }
     }
 
 //endregion

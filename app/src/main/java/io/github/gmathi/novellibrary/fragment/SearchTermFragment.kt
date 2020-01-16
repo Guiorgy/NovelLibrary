@@ -24,9 +24,17 @@ import io.github.gmathi.novellibrary.util.setDefaults
 import kotlinx.android.synthetic.main.content_recycler_view.*
 import kotlinx.android.synthetic.main.listitem_novel.view.*
 import java.net.URLEncoder
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
+
+
+    override var currentPageNumber: Int = 1
+    override val preloadCount:Int = 50
+    override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
+    private lateinit var searchTerm: String
+    private lateinit var resultType: String
 
     companion object {
         fun newInstance(searchTerms: String, resultType: String): SearchTermFragment {
@@ -119,6 +127,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
                 android.util.Log.i("MyState3", "searchNovels! visible=$isVisible, detached=$isDetached, removing=$isRemoving")
                 if (isVisible && (!isDetached || !isRemoving)) {
                     loadSearchResults(results)
+                    isPageLoading.lazySet(false)
                     swipeRefreshLayout.isRefreshing = false
                 }
             } else {
@@ -159,8 +168,10 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     }
 
     override fun loadMore() {
-        currentPageNumber++
-        searchNovels()
+        if (isPageLoading.compareAndSet(false, true)) {
+            currentPageNumber++
+            searchNovels()
+        }
     }
 
     //region Adapter Listener Methods - onItemClick(), viewBinder()
