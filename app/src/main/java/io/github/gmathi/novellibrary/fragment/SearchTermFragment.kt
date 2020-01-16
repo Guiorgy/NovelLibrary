@@ -85,7 +85,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
             items.clear()
             items.addAll(savedInstanceState.getParcelableArrayList("results")!!)
             currentPageNumber = savedInstanceState.getInt("page")
-            android.util.Log.i("MyState3", "restoring ${adapter.items.count()}/${recyclerView.adapter?.itemCount} items, currentPageNumber=$currentPageNumber, visible=$isVisible")
+            android.util.Log.i("MyState3", "restoring ${items.count()} items, currentPageNumber=$currentPageNumber, visible=$isVisible")
         }
     }
 
