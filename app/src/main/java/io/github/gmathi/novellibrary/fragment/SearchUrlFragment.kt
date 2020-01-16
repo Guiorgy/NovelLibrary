@@ -25,12 +25,9 @@ import kotlinx.android.synthetic.main.listitem_novel.view.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
-
-
-    override var currentPageNumber: Int = 1
+    
     override val preloadCount:Int = 50
     override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
-    private lateinit var searchUrl: String
 
     companion object {
         fun newInstance(url: String): SearchUrlFragment {

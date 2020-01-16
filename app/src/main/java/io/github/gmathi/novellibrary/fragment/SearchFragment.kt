@@ -2,20 +2,17 @@ package io.github.gmathi.novellibrary.fragment
 
 import android.animation.Animator
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.core.view.GravityCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
 import io.github.gmathi.novellibrary.R
 import io.github.gmathi.novellibrary.adapter.GenericFragmentStatePagerAdapter
 import io.github.gmathi.novellibrary.adapter.NavPageListener
+import io.github.gmathi.novellibrary.adapter.SearchResultsListener
+import io.github.gmathi.novellibrary.dataCenter
 import io.github.gmathi.novellibrary.extensions.hideSoftKeyboard
-import io.github.gmathi.novellibrary.network.HostNames
 import io.github.gmathi.novellibrary.util.SimpleAnimationListener
 import io.github.gmathi.novellibrary.util.SuggestionsBuilder
 import io.github.gmathi.novellibrary.util.addToSearchHistory

@@ -29,12 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
 
-
-    override var currentPageNumber: Int = 1
     override val preloadCount:Int = 50
     override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
-    private lateinit var searchTerm: String
-    private lateinit var resultType: String
 
     companion object {
         fun newInstance(searchTerms: String, resultType: String): SearchTermFragment {
