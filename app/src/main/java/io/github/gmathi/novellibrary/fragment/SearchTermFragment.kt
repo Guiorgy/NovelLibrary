@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import co.metalab.asyncawait.async
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -29,8 +28,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
 
-    override val preloadCount:Int = 50
-    override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
 
     companion object {
         fun newInstance(searchTerms: String, resultType: String): SearchTermFragment {
@@ -45,6 +42,8 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     }
 
     override var currentPageNumber: Int = 1
+    override val preloadCount:Int = 50
+    override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
     private lateinit var searchTerm: String
     private lateinit var resultType: String
     private lateinit var adapter: GenericAdapter<Novel>
@@ -52,6 +51,26 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        searchTerm = arguments?.getString("searchTerm")!!
+        resultType = arguments?.getString("resultType")!!
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("searchTerm"))
+                searchTerm = savedInstanceState.getString("searchTerm", searchTerm)
+
+            if (savedInstanceState.containsKey("resultType"))
+                resultType = savedInstanceState.getString("resultType", resultType)
+
+
+            if (savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
+                items.clear()
+                @Suppress("UNCHECKED_CAST")
+                items.addAll(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
+                currentPageNumber = savedInstanceState.getInt("page")
+            }
+        }
+
         setHasOptionsMenu(true)
         android.util.Log.i("MyState3", "onCreate, visible=$isVisible")
 
@@ -212,8 +231,10 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         android.util.Log.i("MyState3", "onSaveInstanceState with ${items.count()} items, currentPageNumber=$currentPageNumber, searchTerm=$searchTerm, resultType=$resultType, visible=$isVisible")
+
         if (items.isNotEmpty())
-            outState.putSerializable("results", items)
+            outState.putParcelableArrayList("results", items)
+
         outState.putInt("page", currentPageNumber)
         outState.putString("searchTerm", searchTerm)
         outState.putString("resultType", resultType)

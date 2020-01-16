@@ -25,9 +25,6 @@ import kotlinx.android.synthetic.main.listitem_novel.view.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, GenericAdapter.LoadMoreListener {
-    
-    override var preloadCount:Int = 50
-    override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
 
     companion object {
         fun newInstance(url: String): SearchUrlFragment {
@@ -41,12 +38,28 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     }
 
     override var currentPageNumber: Int = 1
+    override var preloadCount:Int = 50
+    override val isPageLoading: AtomicBoolean = AtomicBoolean(false)
     private lateinit var searchUrl: String
     private lateinit var adapter: GenericAdapter<Novel>
     private val items = ArrayList<Novel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        searchUrl = arguments?.getString("url")!!
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("url"))
+                searchUrl = savedInstanceState.getString("url", searchUrl)
+
+            if (savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
+                items.clear()
+                items.addAll(savedInstanceState.getParcelableArrayList("results")!!)
+                currentPageNumber = savedInstanceState.getInt("page")
+            }
+        }
+
         setHasOptionsMenu(true)
         android.util.Log.i("MyState2", "onCreate")
 
@@ -72,6 +85,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         //(activity as AppCompatActivity).setSupportActionBar(null)
+
         setRecyclerView()
         android.util.Log.i("MyState2", "onActivityCreated with ${if (savedInstanceState == null) "null" else "non null"} state")
 
@@ -190,9 +204,11 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         android.util.Log.i("MyState2", "onSaveInstanceState with ${items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
+
         if (items.isNotEmpty())
-            outState.putSerializable("results", items)
-        outState.putSerializable("page", currentPageNumber)
+            outState.putParcelableArrayList("results", items)
+        outState.putInt("page", currentPageNumber)
+
         outState.putString("url", searchUrl)
     }
 

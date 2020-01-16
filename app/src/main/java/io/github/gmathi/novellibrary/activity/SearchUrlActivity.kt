@@ -65,4 +65,5 @@ class SearchUrlActivity : BaseActivity() {
         if (fragment != null)
             supportFragmentManager.putFragment(outState, "SearchUrlFragment", fragment!!)
     }
+
 }

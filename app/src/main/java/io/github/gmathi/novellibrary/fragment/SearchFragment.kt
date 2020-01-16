@@ -28,6 +28,14 @@ class SearchFragment : BaseFragment(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("searchTerm"))
+                searchTerm = savedInstanceState.getString("searchTerm")
+            if (savedInstanceState.containsKey("searchMode"))
+                searchMode = savedInstanceState.getBoolean("searchMode")
+        }
+
         setHasOptionsMenu(true)
         android.util.Log.i("MyState1", "onCreate")
 
@@ -135,11 +143,16 @@ class SearchFragment : BaseFragment(){
             }
         }
 
+        // Delay setSearchListener until searchView is fully drawn
+        // Prevents the listener being called prematurely
+
         searchView.viewTreeObserver.addOnGlobalFocusChangeListener(
                 object : ViewTreeObserver.OnGlobalFocusChangeListener {
                     override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
                         searchView.viewTreeObserver.removeOnGlobalFocusChangeListener(this)
+
                         android.util.Log.i("MyState1", "searchView Ready!")
+
                         searchView.setSearchListener(listener)
                     }
                 })
