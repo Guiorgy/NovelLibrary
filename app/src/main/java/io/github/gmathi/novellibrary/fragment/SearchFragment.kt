@@ -2,16 +2,20 @@ package io.github.gmathi.novellibrary.fragment
 
 import android.animation.Animator
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import io.github.gmathi.novellibrary.R
 import io.github.gmathi.novellibrary.adapter.GenericFragmentStatePagerAdapter
 import io.github.gmathi.novellibrary.adapter.NavPageListener
-import io.github.gmathi.novellibrary.adapter.SearchResultsListener
-import io.github.gmathi.novellibrary.dataCenter
 import io.github.gmathi.novellibrary.extensions.hideSoftKeyboard
+import io.github.gmathi.novellibrary.network.HostNames
 import io.github.gmathi.novellibrary.util.SimpleAnimationListener
 import io.github.gmathi.novellibrary.util.SuggestionsBuilder
 import io.github.gmathi.novellibrary.util.addToSearchHistory
@@ -20,7 +24,7 @@ import kotlinx.android.synthetic.main.fragment_search.*
 import org.cryse.widget.persistentsearch.PersistentSearchView
 
 
-class SearchFragment : BaseFragment() {
+class SearchFragment : BaseFragment(){
 
     //private lateinit var adapter: GenericAdapter<Novel>
     private var searchMode: Boolean = false
@@ -29,6 +33,7 @@ class SearchFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        android.util.Log.i("MyState1", "onCreate")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -36,6 +41,7 @@ class SearchFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        android.util.Log.i("MyState1", "onActivityCreated with ${if (savedInstanceState == null) "null" else "non null"} state")
 
         setSearchView()
 
@@ -45,6 +51,7 @@ class SearchFragment : BaseFragment() {
             if (savedInstanceState.containsKey("searchMode"))
                 searchMode = savedInstanceState.getBoolean("searchMode")
         }
+        android.util.Log.i("MyState1", "onActivityCreated, searchTerm=$searchTerm, searchMode=$searchMode")
 
         if (searchMode && searchTerm != null)
             searchNovels(searchTerm!!)
@@ -53,6 +60,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun setViewPager() {
+        android.util.Log.i("MyState1", "setViewPager")
         while (childFragmentManager.backStackEntryCount > 0)
             childFragmentManager.popBackStack()
         searchTerm = null
@@ -134,6 +142,7 @@ class SearchFragment : BaseFragment() {
                 object : ViewTreeObserver.OnGlobalFocusChangeListener {
                     override fun onGlobalFocusChanged(oldFocus: View?, newFocus: View?) {
                         searchView.viewTreeObserver.removeOnGlobalFocusChangeListener(this)
+                        android.util.Log.i("MyState1", "searchView Ready!")
                         searchView.setSearchListener(listener)
                     }
                 })
@@ -162,9 +171,12 @@ class SearchFragment : BaseFragment() {
         viewPager.offscreenPageLimit = 2
         viewPager.adapter = searchPageAdapter
         tabStrip.setViewPager(viewPager)
+
+        android.util.Log.i("MyState1", "searchNovels, searchTerm=$searchTerm, visibility=${if (viewPager.visibility == View.VISIBLE) "visible" else "invisible"}, currentItem=${viewPager.currentItem}")
     }
 
     fun closeSearch() {
+        android.util.Log.i("MyState1", "close")
         searchView.closeSearch()
         setViewPager()
     }
@@ -173,6 +185,7 @@ class SearchFragment : BaseFragment() {
         super.onSaveInstanceState(outState)
         outState.putBoolean("searchMode", searchMode)
         if (searchTerm != null) outState.putString("searchTerm", searchTerm)
+        android.util.Log.i("MyState1", "onSaveInstanceState, searchTerm=$searchTerm, searchMode=$searchMode")
     }
 
 }

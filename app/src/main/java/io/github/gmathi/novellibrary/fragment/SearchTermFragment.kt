@@ -30,6 +30,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
 
     companion object {
         fun newInstance(searchTerms: String, resultType: String): SearchTermFragment {
+            android.util.Log.i("MyState3", "newInstance")
             val bundle = Bundle()
             bundle.putString("searchTerm", searchTerms)
             bundle.putString("resultType", resultType)
@@ -47,6 +48,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        android.util.Log.i("MyState3", "onCreate, visible=$isVisible")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -66,6 +68,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
             resultType = savedInstanceState.getString("resultType", resultType)
 
         setRecyclerView()
+        android.util.Log.i("MyState3", "onActivityCreated with ${if (savedInstanceState == null) "null" else "non null"} state, searchTerm=$searchTerm, resultType=$resultType, visible=$isVisible")
 
         if (savedInstanceState != null && savedInstanceState.containsKey("results") && savedInstanceState.containsKey("page")) {
             @Suppress("UNCHECKED_CAST")
@@ -82,10 +85,13 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     private fun setRecyclerView() {
         adapter = GenericAdapter(items = ArrayList(), layoutResId = R.layout.listitem_novel, listener = this, loadMoreListener = if (resultType != HostNames.WLN_UPDATES) this else null)
         recyclerView.setDefaults(adapter)
+        recyclerView.layoutManager = LinearLayoutManager(context ,LinearLayoutManager.VERTICAL, false)
         swipeRefreshLayout.setOnRefreshListener { searchNovels() }
+        recyclerView.setBackgroundColor(Color.RED)
     }
 
     private fun searchNovels() {
+        android.util.Log.i("MyState3", "searchNovels, visible=$isVisible")
 
         async search@{
 
@@ -110,6 +116,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
             }
 
             if (results != null) {
+                android.util.Log.i("MyState3", "searchNovels! visible=$isVisible, detached=$isDetached, removing=$isRemoving")
                 if (isVisible && (!isDetached || !isRemoving)) {
                     loadSearchResults(results)
                     swipeRefreshLayout.isRefreshing = false
@@ -126,6 +133,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     }
 
     private fun loadSearchResults(results: ArrayList<Novel>) {
+        android.util.Log.i("MyState3", "loadSearchResults, visible=$isVisible")
         if (results.isNotEmpty() && !adapter.items.containsAll(results)) {
             if (currentPageNumber == 1) {
                 adapter.updateData(results)
@@ -163,6 +171,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
     }
 
     override fun bind(item: Novel, itemView: View, position: Int) {
+        android.util.Log.i("MyState3", "bind $position")
         itemView.novelImageView.setImageResource(android.R.color.transparent)
 
         if (!item.imageUrl.isNullOrBlank()) {
@@ -191,6 +200,7 @@ class SearchTermFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Gener
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        android.util.Log.i("MyState3", "onSaveInstanceState with ${adapter.items.count()} items, currentPageNumber=$currentPageNumber, searchTerm=$searchTerm, resultType=$resultType, visible=$isVisible")
         if (adapter.items.isNotEmpty())
             outState.putSerializable("results", adapter.items)
         outState.putInt("page", currentPageNumber)

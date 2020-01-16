@@ -41,6 +41,7 @@ class LibraryPagerFragment : BaseFragment() {
             startActivityForResult(Intent(activity, NovelSectionsActivity::class.java), Constants.NOVEL_SECTIONS_ACT_REQ_CODE)
         }
 
+        android.util.Log.i("MyState4", "onActivityCreated with ${if (savedInstanceState == null) "null" else "non null"} state")
     }
 
     private fun setViewPager() {

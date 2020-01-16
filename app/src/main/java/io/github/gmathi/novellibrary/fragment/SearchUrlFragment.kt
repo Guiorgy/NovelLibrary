@@ -27,6 +27,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
 
     companion object {
         fun newInstance(url: String): SearchUrlFragment {
+            android.util.Log.i("MyState2", "newInstance")
             val bundle = Bundle()
             bundle.putString("url", url)
             val fragment = SearchUrlFragment()
@@ -42,6 +43,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        android.util.Log.i("MyState2", "onCreate")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -53,6 +55,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
         //(activity as AppCompatActivity).setSupportActionBar(null)
         searchUrl = arguments?.getString("url")!!
         setRecyclerView()
+        android.util.Log.i("MyState2", "onActivityCreated with ${if (savedInstanceState == null) "null" else "non null"} state")
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("url")) {
@@ -63,6 +66,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
                 adapter.updateData(savedInstanceState.getSerializable("results") as java.util.ArrayList<Novel>)
                 currentPageNumber = savedInstanceState.getInt("page")
                 progressLayout.showContent()
+                android.util.Log.i("MyState2", "restoring ${adapter.items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
                 return
             }
         }
@@ -78,6 +82,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     }
 
     private fun searchNovels() {
+        android.util.Log.i("MyState2", "searchNovels")
 
         async search@{
 
@@ -92,6 +97,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
 
             val results = await { NovelApi.searchUrl(searchUrl, pageNumber = currentPageNumber) }
             if (results != null) {
+                android.util.Log.i("MyState2", "searchNovels! visible=$isVisible, detached=$isDetached, removing=$isRemoving")
                 if (isVisible && (!isDetached || !isRemoving)) {
                     loadSearchResults(results)
                     swipeRefreshLayout.isRefreshing = false
@@ -108,6 +114,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
     }
 
     private fun loadSearchResults(results: ArrayList<Novel>) {
+        android.util.Log.i("MyState2", "loadSearchResults")
 
         if (results.isNotEmpty() && !adapter.items.containsAll(results)) {
             if (currentPageNumber == 1) {
@@ -173,6 +180,7 @@ class SearchUrlFragment : BaseFragment(), GenericAdapter.Listener<Novel>, Generi
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        android.util.Log.i("MyState2", "onSaveInstanceState with ${adapter.items.count()} items, currentPageNumber=$currentPageNumber, url=$searchUrl")
         if (adapter.items.isNotEmpty())
             outState.putSerializable("results", adapter.items)
         outState.putSerializable("page", currentPageNumber)
