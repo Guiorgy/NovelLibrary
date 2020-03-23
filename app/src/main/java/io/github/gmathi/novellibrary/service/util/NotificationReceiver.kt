@@ -7,6 +7,10 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import io.github.gmathi.novellibrary.util.Constants
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 internal class NotificationReceiver : BroadcastReceiver() {
@@ -17,8 +21,16 @@ internal class NotificationReceiver : BroadcastReceiver() {
             val id = intent.getIntExtra(EXTRA_ID, Constants.nextNotificationId)
             if (notification == null)
                 Log.e(TAG, "EXTRA_NOTIFICATION ($EXTRA_NOTIFICATION) was not provided!")
-            else
-                NotificationManagerCompat.from(context).notify(id, notification)
+            else {
+                val delay = intent.getLongExtra(EXTRA_INITIAL_DELAY, 0L)
+                if (delay != 0L) {
+                    CoroutineScope(Main).launch {
+                        delay(delay)
+                        NotificationManagerCompat.from(context).notify(id, notification)
+                    }
+                } else
+                    NotificationManagerCompat.from(context).notify(id, notification)
+            }
         }
     }
 
@@ -29,6 +41,7 @@ internal class NotificationReceiver : BroadcastReceiver() {
 
         const val EXTRA_NOTIFICATION = "notification_parcel"
         const val EXTRA_ID = "notification_id"
+        const val EXTRA_INITIAL_DELAY = "notification_initial_delay"
     }
 
 }

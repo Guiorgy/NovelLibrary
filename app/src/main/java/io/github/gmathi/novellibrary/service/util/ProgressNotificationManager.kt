@@ -13,11 +13,9 @@ import androidx.core.app.NotificationManagerCompat
 import io.github.gmathi.novellibrary.BuildConfig
 import io.github.gmathi.novellibrary.R
 import io.github.gmathi.novellibrary.util.Constants
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.Closeable
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -199,8 +197,8 @@ class ProgressNotificationManager(context: Context,
                 if (ignoreSizeLimit || globalQueueSize.get() < sizeLimit) {
                     globalQueueSize.getAndIncrement()
                     queueSize++
-                    // Channel.UNLIMITED and Channel.CONFLATED means send never suspends (blocks)
-                    runBlocking {
+                    // Channel.UNLIMITED and Channel.CONFLATED means send never suspends
+                    CoroutineScope(Main).launch {
                         emptyCallbackChannel.send(false)
                         updateChannel.send(notification)
                     }
